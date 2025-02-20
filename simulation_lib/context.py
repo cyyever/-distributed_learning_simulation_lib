@@ -387,9 +387,11 @@ def allocate_device(
     )
     free_bytes = list(a[1] for a in refined_memory_info_list)
     devices = list(a[0] for a in refined_memory_info_list)
+    devices = devices * 2
     log_warning("Use devices %s", devices)
     if count_server:
         result = {"server_device": devices[0]}
+        devices = devices[0:]
         free_bytes = free_bytes[1:]
         if not free_bytes:
             result |= {"worker_number_per_process": worker_number}
@@ -420,16 +422,3 @@ def allocate_device(
     result |= {"worker_number_per_process": worker_number_per_process}
     result |= {"process_devices": devices}
     return result
-
-
-def get_worker_number_per_process(
-    worker_number: int,
-    count_server: bool = False,
-    least_memory_GB: int | None = None,
-) -> int:
-    res = allocate_device(
-        worker_number=worker_number,
-        count_server=count_server,
-        least_memory_GB=least_memory_GB,
-    )
-    return res["worker_number_per_process"]
